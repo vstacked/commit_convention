@@ -1,0 +1,12 @@
+{
+  "name": "commit_convention",
+  "version": "1.0.0",
+  "main": "main.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^32.0.1"
+  }
+}
