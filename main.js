@@ -1,6 +1,9 @@
 const { app, BrowserWindow, ipcMain, nativeTheme } = require("electron/main");
 const path = require("node:path");
 
+let bluetoothPinCallback;
+let selectBluetoothCallback;
+
 const createWindow = () => {
   const win = new BrowserWindow({
     width: 800,
@@ -8,6 +11,39 @@ const createWindow = () => {
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
+  });
+
+  win.webContents.on("select-bluetooth-device", (event, devices, callback) => {
+    event.preventDefault();
+
+    selectBluetoothCallback = callback;
+
+    const result = devices.find((device) => {
+      return device.deviceName === "LE-Headset";
+    });
+
+    if (result) {
+      callback(result.deviceId);
+    } else {
+      // The device wasn't found so we need to either wait longer (eg until the device is turned on)
+      // or until the user cancels the request
+    }
+  });
+
+  ipcMain.on("cancel-bluetooth-request", (event) => {
+    selectBluetoothCallback("");
+  });
+
+  // Listen for a message from the renderer to get the response for the Bluetooth pairing
+  ipcMain.on("bluetooth-pairing-response", (event, response) => {
+    bluetoothPinCallback(response);
+  });
+
+  win.webContents.session.setBluetoothPairingHandler((details, callback) => {
+    bluetoothPinCallback = callback;
+
+    // Send a message to the renderer to prompt the user to confirm the pairing
+    win.webContents.send("bluetooth-pairing-request", details);
   });
 
   win.loadFile("index.html");
