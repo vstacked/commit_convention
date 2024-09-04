@@ -46,6 +46,42 @@ const createWindow = () => {
     win.webContents.send("bluetooth-pairing-request", details);
   });
 
+  win.webContents.session.on(
+    "select-hid-device",
+    (event, details, callback) => {
+      // Add events to handle devices being added or removed before the callback on
+      // `select-hid-device` is called.
+      win.webContents.session.on("hid-device-added", (event, device) => {
+        console.log("hid-device-added FIRED WITH", device);
+        // Optionally update details.deviceList
+      });
+
+      win.webContents.session.on("hid-device-removed", (event, device) => {
+        console.log("hid-device-removed FIRED WITH", device);
+        // Optionally update details.deviceList
+      });
+
+      event.preventDefault();
+      if (details.deviceList && details.deviceList.length > 0) {
+        callback(details.deviceList[0].deviceId);
+      }
+    },
+  );
+
+  win.webContents.session.setPermissionCheckHandler(
+    (webContents, permission, requestingOrigin, details) => {
+      if (permission === "hid" && details.securityOrigin === "file:///") {
+        return true;
+      }
+    },
+  );
+
+  win.webContents.session.setDevicePermissionHandler((details) => {
+    if (details.deviceType === "hid" && details.origin === "file:///") {
+      return true;
+    }
+  });
+
   win.loadFile("index.html");
 };
 

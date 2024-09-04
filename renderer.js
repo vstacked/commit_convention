@@ -43,7 +43,9 @@ function cancelRequest() {
   window.deviceAccess.cancelBluetoothRequest();
 }
 
-document.getElementById("cancel-bluetooth").addEventListener("click", cancelRequest);
+document
+  .getElementById("cancel-bluetooth")
+  .addEventListener("click", cancelRequest);
 
 window.deviceAccess.bluetoothPairingRequest((event, details) => {
   const response = {};
@@ -74,3 +76,17 @@ window.deviceAccess.bluetoothPairingRequest((event, details) => {
 
   window.deviceAccess.bluetoothPairingResponse(response);
 });
+
+function formatDevices(devices) {
+  return devices.map((device) => device.productName).join("<hr>");
+}
+
+async function testItHID() {
+  const devices = await navigator.hid.getDevices();
+  const request = await navigator.hid.requestDevice({ filters: [] });
+  document.getElementById("granted-devices").innerHTML = formatDevices(devices);
+  document.getElementById("granted-devices2").innerHTML =
+    formatDevices(request);
+}
+
+document.getElementById("test-webhid").addEventListener("click", testItHID);
