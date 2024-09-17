@@ -1,5 +1,6 @@
 :root {
   color-scheme: light dark;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -12,6 +13,78 @@
 @media (prefers-color-scheme: light) {
   body {
     background: #ddd;
-    color: black;
+    color: black
   }
+}
+
+.profile {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+}
+
+.result {
+  background-color: dimgrey;
+  width: auto;
+  height: 10rem;
+  width: auto;
+  overflow: auto;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.result-button {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.result-button button {
+  width: 100%;
+}
+
+.inline-alert {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.type span {
+  font-size: small;
+}
+
+.type input {
+  margin-top: 0.5rem;
+}
+
+.type-content {
+  border: 0.5px solid;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.field textarea {
+  min-height: 1rem;
+  min-width: 10rem;
+  max-height: 10rem;
+  max-width: 40rem;
+}
+
+.autocomplete-items {
+  padding: 10px;
+  cursor: pointer;
+  background-color: black;
+  border-bottom: 1px solid #d4d4d4;
+  position: absolute;
+  z-index: 99;
+}
+
+.autocomplete-items div:hover {
+  background-color: #e9e9e920;
+}
+
+.autocomplete-active {
+  background-color: DodgerBlue !important;
+  color: #ffffff;
 }

@@ -1,22 +1,155 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
-    />
-    <meta
-      http-equiv="X-Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
-    />
-    <title>Hello from Electron renderer!</title>
-    <link rel="stylesheet" type="text/css" href="./style.css" />
-  </head>
-  <body>
-    <h1>Hello from Electron renderer!</h1>
-    <p>👋</p>
-  </body>
-  <script src="./renderer.js"></script>
+
+<head>
+  <meta charset="UTF-8" />
+  <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+  <title>Commit Convention</title>
+  <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+  <link rel="stylesheet" type="text/css" href="./style.css" />
+</head>
+
+<body>
+  <div class="profile">
+    <button type="button" id="profile">
+      Profile
+    </button>
+  </div>
+
+  <div class="result">
+    <span id="result"></span>
+
+    <div class="result-button">
+      <button type="button" name="clear" id="clear">
+        Clear
+      </button>
+
+      <button type="button" name="copy" id="copy">
+        Copy
+      </button>
+    </div>
+  </div>
+
+  <span class="inline-alert" id="inline-alert"></span> <br>
+
+  <div class="field">
+    <div class="type">
+      <label>Type*</label>
+      <div class="type-content">
+        <div>
+          <label><span>API relevant changes</span></label><br>
+
+          &ensp;&ensp;<input type="radio" id="feat" name="type" value="feat">
+          <label for="feat">
+            <code>feat</code>
+            &emsp;&emsp;
+            <span>Commits, that adds or remove a new feature</span>
+          </label><br>
+
+          &ensp;&ensp;<input type="radio" id="fix" name="type" value="fix">
+          <label for="fix">
+            <code>fix</code>
+            &emsp;&emsp;&ensp;
+            <span>Commits, that fixes a bug</span>
+          </label><br>
+        </div>
+
+        <div>
+          <input type="radio" id="refactor" name="type" value="refactor">
+          <label for="refactor">
+            <code>refactor</code>
+            &emsp;
+            <span>Commits, that rewrite/restructure your code, however does not change any API behaviour</span>
+          </label><br>
+
+          &ensp;&ensp;<input type="radio" id="perf" name="type" value="perf">
+          <label for="perf">
+            <code>perf</code>
+            &emsp;&emsp;
+            <span>Commits are special <code>refactor</code> commits, that improve performance</span>
+          </label><br>
+        </div>
+
+        <input type="radio" id="style" name="type" value="style">
+        <label for="style">
+          <code>style</code>
+          &emsp;&emsp;&ensp;
+          <span>
+            Commits, that do not affect the meaning (white-space, formatting, missing semi-colons, etc)
+          </span>
+        </label><br>
+
+        <input type="radio" id="test" name="type" value="test">
+        <label for="test">
+          <code>test</code>
+          &emsp;&emsp;&emsp;
+          <span>Commits, that add missing tests or correcting existing tests</span>
+        </label><br>
+
+        <input type="radio" id="docs" name="type" value="docs">
+        <label for="docs">
+          <code>docs</code>
+          &emsp;&emsp;&emsp;
+          <span>Commits, that affect documentation only</span>
+        </label><br>
+
+        <input type="radio" id="build" name="type" value="build">
+        <label for="build">
+          <code>build</code>
+          &emsp;&emsp;&ensp;
+          <span>
+            Commits, that affect build components like build tool, ci pipeline, dependencies, project version, ...
+          </span>
+        </label><br>
+
+        <input type="radio" id="ops" name="type" value="ops">
+        <label for="ops">
+          <code>ops</code>
+          &emsp;&emsp;&emsp;&ensp;
+          <span>
+            Commits, that affect operational components like infrastructure, deployment, backup, recovery, ...
+          </span>
+        </label><br>
+
+        <input type="radio" id="chore" name="type" value="chore">
+        <label for="chore">
+          <code>chore</code>
+          &emsp;&emsp;&ensp;
+          <span>Miscellaneous commits e.g. modifying <code>.gitignore</code></span>
+        </label><br>
+        <input type="radio" id="wip" name="type" value="wip">
+        <label for="wip">
+          <code>WIP</code>
+          &emsp;&emsp;&emsp;&ensp;
+          <span>Work In Progress</span>
+        </label><br>
+      </div>
+    </div>
+
+    <div>
+      <label for="scope">Scope</label>
+      <input type="text" id="scope" name="scope"><br>
+    </div>
+
+    <div>
+      <label for="description">Description</label>
+      <textarea id="description" name="description" rows="2" cols="30"></textarea><br>
+    </div>
+
+    <div>
+      <label for="body">Body</label>
+      <textarea id="body" name="body" rows="2" cols="30"></textarea><br>
+    </div>
+
+    <div>
+      <label for="footer">Footer(s)</label>
+      <textarea id="footer" name="footer" rows="2" cols="30"></textarea><br>
+    </div>
+  </div>
+</body>
+
+<script type="text/javascript" src="./node_modules/jquery/dist/jquery.min.js"></script>
+<script src="./renderer.js"></script>
+
 </html>
