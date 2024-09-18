@@ -10,6 +10,10 @@ $(function () {
     const $body = $("#body");
     const $footer = $("#footer");
 
+    $profile.on("click", () => {
+        window.profile.toggle();
+    })
+
     const scopeRegex = /\((.*?)\):/;
     const n = "<br>"
 
