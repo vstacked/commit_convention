@@ -9,5 +9,8 @@
   "devDependencies": {
     "electron": "^32.0.1",
     "jquery": "^3.7.1"
+  },
+  "dependencies": {
+    "sanitize-html": "^2.13.0"
   }
 }

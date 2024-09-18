@@ -150,7 +150,7 @@ $(function () {
         $result.html(val + tail);
     });
 
-    $scope.on('propertychange input', function (e) {
+    $scope.on('propertychange input', async function (e) {
         var valueChanged = false;
 
         if (e.type == 'propertychange') {
@@ -161,11 +161,11 @@ $(function () {
 
         if (!valueChanged) return;
 
-        const scope = e.target.value;
+        const scope = await window.secureApi.sanitizeInput(e.target.value);
         handleScope(scope)
     });
 
-    $description.on('propertychange input', function (e) {
+    $description.on('propertychange input', async function (e) {
         var valueChanged = false;
 
         if (e.type == 'propertychange') {
@@ -176,11 +176,11 @@ $(function () {
 
         if (!valueChanged) return;
 
-        const description = e.target.value;
+        const description = await window.secureApi.sanitizeInput(e.target.value);
         handleDescription(description)
     });
 
-    $body.on('propertychange input', function (e) {
+    $body.on('propertychange input', async function (e) {
         var valueChanged = false;
 
         if (e.type == 'propertychange') {
@@ -191,11 +191,11 @@ $(function () {
 
         if (!valueChanged) return;
 
-        const body = e.target.value;
+        const body = await window.secureApi.sanitizeInput(e.target.value);
         handleBody(body)
     });
 
-    $footer.on('propertychange input', function (e) {
+    $footer.on('propertychange input', async function (e) {
         var valueChanged = false;
 
         if (e.type == 'propertychange') {
@@ -206,7 +206,7 @@ $(function () {
 
         if (!valueChanged) return;
 
-        const footer = e.target.value;
+        const footer = await window.secureApi.sanitizeInput(e.target.value);
         handleFooter(footer)
     });
 
@@ -214,7 +214,7 @@ $(function () {
     function autocomplete(inp, arr, cb) {
         let currentFocus;
 
-        $(inp).on('propertychange input', function (e) {
+        $(inp).on('propertychange input', async function (e) {
             let valueChanged = false;
 
             if (e.type == 'propertychange') {
@@ -225,7 +225,7 @@ $(function () {
 
             if (!valueChanged) return;
 
-            let val = $(this).val();
+            let val = await window.secureApi.sanitizeInput($(this).val());
 
             closeAllLists();
             if (!val) { return }

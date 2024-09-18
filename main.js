@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require("electron/main");
 const path = require("node:path");
+const sanitizeHtml = require("sanitize-html")
 
 let winMain, winProfile, winProfileToggle;
 
@@ -71,4 +72,8 @@ ipcMain.handle("profile:toggle", () => {
     createWindowProfile()
     winProfileToggle = true
   }
+})
+
+ipcMain.handle("secureApi:sanitizeInput", (_event, input) => {
+  return sanitizeHtml(input)
 })

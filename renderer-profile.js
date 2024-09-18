@@ -221,7 +221,7 @@ $(function () {
     }
 
     addProfileInput
-        .on('propertychange input', function (e) {
+        .on('propertychange input', async function (e) {
             var valueChanged = false;
 
             if (e.type == 'propertychange') {
@@ -232,7 +232,7 @@ $(function () {
 
             if (!valueChanged) return;
 
-            addProfileText = e.target.value
+            addProfileText = await window.secureApi.sanitizeInput(e.target.value)
         })
         .on("focus", (e) => {
             const btnCancel = $("<button>")
