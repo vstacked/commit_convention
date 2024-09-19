@@ -1,0 +1,24 @@
+{
+    "profiles": {
+        "12321": {
+            "profile": "name",
+            "scope": [
+                "1",
+                "2"
+            ],
+            "description": [
+                "1",
+                "2"
+            ],
+            "body": [
+                "1",
+                "2"
+            ],
+            "footer": [
+                "1",
+                "2"
+            ]
+        }
+    },
+    "profileUsed": "12321"
+}

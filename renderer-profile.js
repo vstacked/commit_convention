@@ -1,4 +1,4 @@
-$(function () {
+$(async function () {
     const close = $("#close");
     const collapsibleParent = $("#collapsible-parent");
     const addProfileInput = $("#add-profile-input");
@@ -12,212 +12,323 @@ $(function () {
         window.profile.toggle();
     })
 
-    const r = [
-        "Ducimus qui accusantium ut ut ut illum.",
-        "Sed aliquam quia sit voluptas non quia.",
-        "Possimus pariatur iste et vitae officia sed.",
-        "Neque voluptas enim quidem qui velit nobis mollitia eveniet voluptatem.",
-    ]
+    let profiles = await window.store.getProfiles()
+    let profileUsed = await window.store.getProfileUsed()
 
-    // Prefixes:
-    // - p: for profile name component related
-    // - c: for content component related
-    for (let index = 0; index < r.length; index++) {
-        const profileName = "Open Section " + (index + 1)
+    async function refetchLocal() {
+        profiles = await window.store.getProfiles()
+        profileUsed = await window.store.getProfileUsed()
+    }
 
-        function hasProjectNameChanged() {
-            return pInput.val() !== profileName;
-        }
+    function generateProfileList() {
+        // Prefixes:
+        // - p: for profile name component related
+        // - c: for content component related
+        for (let id in profiles) {
+            const isDefaultProfile = id === "default";
 
-        function resetEditButton() {
-            if (pProfile.hasClass("active")) {
-                pBtnAction.html("Hide")
-                pBtnApply.show()
-            } else {
-                pBtnAction.html("Show")
+            const isApplied = profileUsed === id;
+
+            const item = profiles[id]
+            const profileName = item.profile
+
+            function hasProjectNameChanged() {
+                return pInput.val() !== profileName;
             }
 
-            pBtnCancel.hide()
-        }
-
-
-        const pInput = $("<input>")
-            .val(profileName)
-            .on("focusout", () => {
-                if (!hasProjectNameChanged()) {
-                    resetEditButton()
-                }
-            })
-            .on('propertychange input', function (e) {
-                var valueChanged = false;
-
-                if (e.type == 'propertychange') {
-                    valueChanged = e.originalEvent.propertyName == 'value';
-                } else {
-                    valueChanged = true;
-                }
-
-                if (!valueChanged) return;
-
-                if (hasProjectNameChanged()) {
-                    pBtnAction.html("Edit")
-                    pBtnCancel.show()
-                    pBtnApply.hide()
-                }
-            })
-
-
-        const pBtnCancel = $("<button>")
-            .attr({ type: "button" })
-            .append("Cancel")
-            .hide()
-            .on("click", () => {
-                pInput.val(profileName)
-                resetEditButton()
-            })
-
-        const pBtnAction = $("<button>")
-            .addClass("p-btn-action")
-            .attr({ type: "button" })
-            .append("Show")
-            .on("click", () => {
-                if (hasProjectNameChanged()) {
-                    // TODO: update title to local
-                    resetEditButton()
-                    return
-                }
-
-                if (cContent.css("display") === "block") {
-                    pProfile.removeClass("active")
-                    cContent.hide()
-                    pBtnAction.html("Show")
-
-                    pBtnApply.hide()
-                } else {
-                    pProfile.addClass("active")
-                    cContent.show()
+            function resetEditButton() {
+                if (pProfile.hasClass("active")) {
                     pBtnAction.html("Hide")
-
                     pBtnApply.show()
-
-                    const otherTitle = $(".collapsible")
-                    const otherContent = $(".content")
-                    const otherBtnActionTitle = $(".p-btn-action")
-                    const otherBtnApplyProfile = $(".p-btn-apply")
-                    otherTitle.not(pProfile).removeClass("active")
-                    otherContent.not(cContent).hide()
-                    otherBtnActionTitle.not(pBtnAction).html("Show")
-                    otherBtnApplyProfile.not(pBtnApply).hide()
-
-                    $('html, body').animate({
-                        scrollTop: collapsibleChild.offset().top
-                    }, 250)
+                } else {
+                    pBtnAction.html("Show")
                 }
-            })
 
-        const pBtnApply = $("<button>")
-            .addClass("p-btn-apply")
-            .attr({ type: "button" })
-            .append("Apply Profile")
-            .hide()
-            .on("click", () => {
-                // TODO: apply profile
-            })
-
-        const pBtn = $("<div>")
-            .append(pBtnCancel)
-            .append(pBtnAction)
-            .append(pBtnApply)
-
-        const pProfile = $("<div>")
-            .addClass("collapsible")
-            .append(pInput)
-            .append(pBtn)
-
-        // ---------------------------------------------------------------------
-        // ---------------------------------------------------------------------
-
-        function contentItem(text, appendTo) {
-            function resetDeleteButton() {
-                cBtnCancel.hide()
-                cBtnDelete.removeClass("delete")
+                pBtnDelete.show()
+                pBtnCancelEdit.hide()
+                inlineAlert.html("")
             }
 
-            const cBtnCancel = $("<button>")
+            function resetDeleteProfileButton() {
+                pBtnCancelDelete.hide()
+                pBtnDelete.removeClass("delete-profile")
+            }
+
+            function showContent() {
+                pProfile.addClass("active")
+                cContent.show()
+                pBtnAction.html("Hide")
+
+                pBtnApply.show()
+            }
+
+            const pInput = $("<input>")
+                .val(profileName)
+                .prop("disabled", isDefaultProfile)
+                .on("focusout", () => {
+                    if (!hasProjectNameChanged()) {
+                        resetEditButton()
+                    }
+                })
+                .on('propertychange input', function (e) {
+                    var valueChanged = false;
+
+                    if (e.type == 'propertychange') {
+                        valueChanged = e.originalEvent.propertyName == 'value';
+                    } else {
+                        valueChanged = true;
+                    }
+
+                    if (!valueChanged) return;
+
+                    if (hasProjectNameChanged()) {
+                        pBtnAction.html("Edit")
+                        pBtnCancelEdit.show()
+                        pBtnApply.hide()
+                        pBtnDelete.hide()
+                        resetDeleteProfileButton()
+                    }
+                })
+
+
+            const pBtnCancelEdit = $("<button>")
                 .attr({ type: "button" })
                 .append("Cancel")
                 .hide()
                 .on("click", () => {
-                    resetDeleteButton()
+                    pInput.val(profileName)
+                    resetEditButton()
                 })
 
-            const cBtnDelete = $("<button>")
+            const pBtnCancelDelete = $("<button>")
                 .attr({ type: "button" })
-                .html("Delete")
+                .append("Cancel")
+                .hide()
                 .on("click", () => {
-                    if (cBtnDelete.hasClass("delete")) {
-                        resetDeleteButton()
+                    resetDeleteProfileButton()
+                })
 
-                        // TODO: delete item
+            const pBtnDelete = $("<button>")
+                .attr({ type: "button" })
+                .append("Delete Profile")
+                .on("click", async () => {
+                    if (pBtnDelete.hasClass("delete-profile")) {
+                        await window.store.deleteProfile(id)
+                        await rerenderCollapsibleChild()
+
+                        resetDeleteProfileButton()
                     } else {
-                        cBtnDelete.addClass("delete")
-                        cBtnCancel.show()
+                        pBtnDelete.addClass("delete-profile")
+                        pBtnCancelDelete.show()
                     }
                 })
 
-            const cBtn = $("<div>")
-                .addClass("row")
-                .append(cBtnCancel)
-                .append(cBtnDelete)
+            const pBtnAction = $("<button>")
+                .addClass("p-btn-action")
+                .attr({ type: "button" })
+                .append("Show")
+                .on("click", async () => {
+                    if (hasProjectNameChanged()) {
+                        const newName = pInput.val()
+
+                        if (!safeCharactersRegex.test(newName)) {
+                            inlineAlert.html("Input contains invalid characters. Please use only letters, numbers, and the following symbols: . _ ( ) : @ -")
+                            return
+                        }
+
+                        await window.store.renameProfile({ id, newName })
+                        await rerenderCollapsibleChild()
+
+                        resetEditButton()
+                        return
+                    }
+
+                    if (cContent.css("display") === "block") {
+                        pProfile.removeClass("active")
+                        cContent.hide()
+                        pBtnAction.html("Show")
+
+                        showedProfile = id;
+
+                        pBtnApply.hide()
+                    } else {
+                        showContent()
+
+                        const otherTitle = $(".collapsible")
+                        const otherContent = $(".content")
+                        const otherBtnActionTitle = $(".p-btn-action")
+                        const otherBtnApplyProfile = $(".p-btn-apply")
+                        otherTitle.not(pProfile).removeClass("active")
+                        otherContent.not(cContent).hide()
+                        otherBtnActionTitle.not(pBtnAction).html("Show")
+                        otherBtnApplyProfile.not(pBtnApply).hide()
+
+                        $('html, body').animate({
+                            scrollTop: collapsibleChild.offset().top
+                        }, 250)
+                    }
+                })
+
+            const pBtnApply = $("<button>")
+                .addClass("p-btn-apply")
+                .attr({ type: "button" })
+                .prop("disabled", isApplied)
+                .append(isApplied ? "Applied" : "Apply Profile")
+                .hide()
+                .on("click", async () => {
+                    await window.store.applyProfile(id)
+                    await rerenderCollapsibleChild()
+                })
+
+            const pBtn = isDefaultProfile
+                ? $("<div>")
+                    .append(pBtnAction)
+                    .append(pBtnApply)
+                : isApplied ?
+                    $("<div>")
+                        .append(pBtnCancelEdit)
+                        .append(pBtnAction)
+                        .append(pBtnApply)
+                    : $("<div>")
+                        .append(pBtnCancelDelete)
+                        .append(pBtnDelete)
+                        .append(pBtnCancelEdit)
+                        .append(pBtnAction)
+                        .append(pBtnApply)
 
 
-            $("<div>")
-                .addClass("row")
-                .append($("<span>").html(text))
-                .append(cBtn)
-                .appendTo(appendTo)
+            const pProfile = $("<div>")
+                .addClass("collapsible")
+                .append(pInput)
+                .append(pBtn)
+
+            // ---------------------------------------------------------------------
+            // ---------------------------------------------------------------------
+
+            function contentItem(key, text, appendTo, generate) {
+                function resetDeleteContentButton() {
+                    cBtnCancel.hide()
+                    cBtnDelete.removeClass("delete-content")
+                }
+
+                const cBtnCancel = $("<button>")
+                    .attr({ type: "button" })
+                    .append("Cancel")
+                    .hide()
+                    .on("click", () => {
+                        resetDeleteContentButton()
+                    })
+
+                const cBtnDelete = $("<button>")
+                    .attr({ type: "button" })
+                    .html("Delete")
+                    .on("click", () => {
+                        if (cBtnDelete.hasClass("delete-content")) {
+                            resetDeleteContentButton()
+
+                            void window.store.deleteContent({
+                                id: profileUsed,
+                                key,
+                                content: text,
+                            }).then(async () => {
+                                await refetchLocal()
+                                $("." + key + "-list div").remove()
+                                generate()
+                            })
+                        } else {
+                            cBtnDelete.addClass("delete-content")
+                            cBtnCancel.show()
+                        }
+                    })
+
+                const cBtn = $("<div>")
+                    .addClass("row")
+                    .append(cBtnCancel)
+                    .append(cBtnDelete)
+
+
+                $("<div>")
+                    .addClass("row")
+                    .append($("<span>").html(text))
+                    .append(cBtn)
+                    .appendTo(appendTo)
+            }
+
+            const cScope = $("<div>")
+                .addClass("scope-list")
+                .append($("<h3>").html("Scope"))
+            function generateScope() {
+                const dataScope = profiles[id].scope;
+                const lenScope = dataScope.length;
+                for (let i = 0; i < lenScope; i++) {
+                    const text = dataScope[i];
+                    contentItem("scope", text, cScope, generateScope)
+                }
+            }
+            generateScope()
+
+            const cDescription = $("<div>")
+                .addClass("description-list")
+                .append($("<h3>").html("Description"))
+            function generateDescription() {
+                const dataDescription = profiles[id].description;
+                const lenDescription = dataDescription.length;
+                for (let i = 0; i < lenDescription; i++) {
+                    const text = dataDescription[i];
+                    contentItem("description", text, cDescription, generateDescription)
+                }
+            }
+            generateDescription()
+
+            const cBody = $("<div>")
+                .addClass("body-list")
+                .append($("<h3>").html("Body"))
+            function generateBody() {
+                const dataBody = profiles[id].body;
+                const lenBody = dataBody.length;
+                for (let i = 0; i < lenBody; i++) {
+                    const text = dataBody[i];
+                    contentItem("body", text, cBody, generateBody)
+                }
+            }
+            generateBody()
+
+            const cFooter = $("<div>")
+                .addClass("footer-list")
+                .append($("<h3>").html("Footer"))
+            function generateFooter() {
+                const dataFooter = profiles[id].footer;
+                const lenFooter = dataFooter.length;
+                for (let i = 0; i < lenFooter; i++) {
+                    const text = dataFooter[i];
+                    contentItem("footer", text, cFooter, generateFooter)
+                }
+            }
+            generateFooter()
+
+            const cContent = $("<div>")
+                .addClass("content")
+                .append(cScope)
+                .append(cDescription)
+                .append(cBody)
+                .append(cFooter)
+
+            const collapsibleChild = $("<div>")
+                .addClass("collapsible-child")
+                .append(pProfile)
+                .append(cContent)
+                .appendTo(collapsibleParent)
+
+            // show content in initial open window
+            if (isApplied) showContent()
         }
+    }
+    generateProfileList()
 
-        const cScope = $("<div>")
-            .append($("<h3>").html("Scope"))
-        for (let i = 0; i < r.length; i++) {
-            const text = r[i];
-            contentItem(text, cScope)
-        }
-
-        const cDescription = $("<div>")
-            .append($("<h3>").html("Description"))
-        for (let i = 0; i < r.length; i++) {
-            const text = r[i];
-            contentItem(text, cDescription)
-        }
-
-        const cBody = $("<div>")
-            .append($("<h3>").html("Body"))
-        for (let i = 0; i < r.length; i++) {
-            const text = r[i];
-            contentItem(text, cBody)
-        }
-
-        const cFooter = $("<div>")
-            .append($("<h3>").html("Footer"))
-        for (let i = 0; i < r.length; i++) {
-            const text = r[i];
-            contentItem(text, cFooter)
-        }
-
-        const cContent = $("<div>")
-            .addClass("content")
-            .append(cScope)
-            .append(cDescription)
-            .append(cBody)
-            .append(cFooter)
-
-        const collapsibleChild = $("<div>")
-            .addClass("collapsible-child")
-            .append(pProfile)
-            .append(cContent)
-            .appendTo(collapsibleParent)
+    async function rerenderCollapsibleChild() {
+        await refetchLocal()
+        $(".collapsible-child").remove();
+        generateProfileList()
     }
 
     addProfileInput
@@ -248,18 +359,19 @@ $(function () {
             const btnSave = $("<button>")
                 .attr({ type: "button" })
                 .html("Save")
-                .on("click", () => {
+                .on("click", async () => {
                     if (!safeCharactersRegex.test(addProfileText)) {
                         inlineAlert.html("Input contains invalid characters. Please use only letters, numbers, and the following symbols: . _ ( ) : @ -")
                         return
                     }
 
+                    await window.store.addProfile(addProfileText);
+                    await rerenderCollapsibleChild()
+
                     addProfileText = ""
                     addProfileInput.val("")
                     inlineAlert.html("")
                     btns.remove()
-
-                    // TODO: save profile
                 })
 
             const btns = $("<div>")

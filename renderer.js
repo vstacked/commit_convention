@@ -1,4 +1,4 @@
-$(function () {
+$(async function () {
     const $profile = $("#profile");
     const $result = $("#result");
     const $clear = $("#clear");
@@ -10,9 +10,15 @@ $(function () {
     const $body = $("#body");
     const $footer = $("#footer");
 
+    const profiles = await window.store.getProfiles()
+    const profileUsed = await window.store.getProfileUsed()
+
+    const profileName = profiles[profileUsed].profile
+
     $profile.on("click", () => {
-        window.profile.toggle();
+        void window.profile.toggle();
     })
+    $("<span>").append(profileName).insertAfter($profile)
 
     const scopeRegex = /\((.*?)\):/;
     const n = "<br>"
@@ -139,6 +145,16 @@ $(function () {
         setTimeout(() => {
             $inlineAlert.hide()
         }, 1000);
+
+        void window.store.saveContent({
+            id: profileUsed,
+            scope: $scope.val(),
+            description: $description.val(),
+            body: $body.val(),
+            footer: $footer.val(),
+        }).then(() => {
+            void initAutocomplete()
+        })
     })
 
     $type.on("click", function () {
@@ -301,19 +317,27 @@ $(function () {
         })
     }
 
-    autocomplete($scope, [], function (selected) {
-        handleScope(selected)
-    });
+    async function getAutocomplete(key) {
+        return window.store.getContent({ id: profileUsed, key })
+    }
 
-    autocomplete($description, [], function (selected) {
-        handleDescription(selected)
-    });
+    async function initAutocomplete() {
+        autocomplete($scope, await getAutocomplete("scope"), function (selected) {
+            handleScope(selected)
+        });
 
-    autocomplete($body, [], function (selected) {
-        handleBody(selected)
-    });
+        autocomplete($description, await getAutocomplete("description"), function (selected) {
+            handleDescription(selected)
+        });
 
-    autocomplete($footer, [], function (selected) {
-        handleFooter(selected)
-    });
+        autocomplete($body, await getAutocomplete("body"), function (selected) {
+            handleBody(selected)
+        });
+
+        autocomplete($footer, await getAutocomplete("footer"), function (selected) {
+            handleFooter(selected)
+        });
+    }
+
+    void initAutocomplete()
 })
