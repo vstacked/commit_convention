@@ -6,145 +6,191 @@
   <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
   <title>Commit Convention</title>
-  <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
   <link rel="stylesheet" type="text/css" href="./style.css" />
 </head>
 
 <body>
-  <div class="profile">
-    <button type="button" id="profile">
-      Profile
-    </button>
-  </div>
-
-  <div class="result">
-    <span id="result"></span>
-
-    <div class="result-button">
-      <button type="button" name="clear" id="clear">
-        Clear
-      </button>
-
-      <button type="button" name="copy" id="copy">
-        Copy
-      </button>
+  <div class="app-bar">
+    <div class="profile" id="profile">
+      <svg xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 448 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+        <path fill="#eeeeee"
+          d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z" />
+      </svg>
     </div>
+    <div class="drag-area"></div>
   </div>
 
-  <span class="inline-alert" id="inline-alert"></span> <br>
+  <div class="body-content">
+    <div class="result">
+      <div class="result-scroll">
+        <span id="result"></span>
+      </div>
 
-  <div class="field">
-    <div class="type">
-      <label>Type*</label>
-      <div class="type-content">
-        <div>
-          <label><span>API relevant changes</span></label><br>
+      <div class="result-button">
+        <button type="button" name="clear" id="clear" class="clear">
+          <svg xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 576 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+            <path fill="#eeeeee"
+              d="M290.7 57.4L57.4 290.7c-25 25-25 65.5 0 90.5l80 80c12 12 28.3 18.7 45.3 18.7L288 480l9.4 0L512 480c17.7 0 32-14.3 32-32s-14.3-32-32-32l-124.1 0L518.6 285.3c25-25 25-65.5 0-90.5L381.3 57.4c-25-25-65.5-25-90.5 0zM297.4 416l-9.4 0-105.4 0-80-80L227.3 211.3 364.7 348.7 297.4 416z" />
+          </svg>
+          <p>Clear</p>
+        </button>
 
-          &ensp;&ensp;<input type="radio" id="feat" name="type" value="feat">
-          <label for="feat">
-            <code>feat</code>
-            &emsp;&emsp;
-            <span>Commits, that adds or remove a new feature</span>
-          </label><br>
+        <div class="divider"></div>
 
-          &ensp;&ensp;<input type="radio" id="fix" name="type" value="fix">
-          <label for="fix">
-            <code>fix</code>
-            &emsp;&emsp;&ensp;
-            <span>Commits, that fixes a bug</span>
-          </label><br>
-        </div>
+        <button type="button" name="copy-plain" id="copy-plain" class="copy">
+          <svg xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 448 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+            <path fill="#222831"
+              d="M384 336l-192 0c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l140.1 0L400 115.9 400 320c0 8.8-7.2 16-16 16zM192 384l192 0c35.3 0 64-28.7 64-64l0-204.1c0-12.7-5.1-24.9-14.1-33.9L366.1 14.1c-9-9-21.2-14.1-33.9-14.1L192 0c-35.3 0-64 28.7-64 64l0 256c0 35.3 28.7 64 64 64zM64 128c-35.3 0-64 28.7-64 64L0 448c0 35.3 28.7 64 64 64l192 0c35.3 0 64-28.7 64-64l0-32-48 0 0 32c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l32 0 0-48-32 0z" />
+          </svg>
+          <p>Plain</p>
+        </button>
 
-        <div>
-          <input type="radio" id="refactor" name="type" value="refactor">
-          <label for="refactor">
-            <code>refactor</code>
-            &emsp;
-            <span>Commits, that rewrite/restructure your code, however does not change any API behaviour</span>
-          </label><br>
+        <div class="divider"></div>
 
-          &ensp;&ensp;<input type="radio" id="perf" name="type" value="perf">
-          <label for="perf">
-            <code>perf</code>
-            &emsp;&emsp;
-            <span>Commits are special <code>refactor</code> commits, that improve performance</span>
-          </label><br>
-        </div>
-
-        <input type="radio" id="style" name="type" value="style">
-        <label for="style">
-          <code>style</code>
-          &emsp;&emsp;&ensp;
-          <span>
-            Commits, that do not affect the meaning (white-space, formatting, missing semi-colons, etc)
-          </span>
-        </label><br>
-
-        <input type="radio" id="test" name="type" value="test">
-        <label for="test">
-          <code>test</code>
-          &emsp;&emsp;&emsp;
-          <span>Commits, that add missing tests or correcting existing tests</span>
-        </label><br>
-
-        <input type="radio" id="docs" name="type" value="docs">
-        <label for="docs">
-          <code>docs</code>
-          &emsp;&emsp;&emsp;
-          <span>Commits, that affect documentation only</span>
-        </label><br>
-
-        <input type="radio" id="build" name="type" value="build">
-        <label for="build">
-          <code>build</code>
-          &emsp;&emsp;&ensp;
-          <span>
-            Commits, that affect build components like build tool, ci pipeline, dependencies, project version, ...
-          </span>
-        </label><br>
-
-        <input type="radio" id="ops" name="type" value="ops">
-        <label for="ops">
-          <code>ops</code>
-          &emsp;&emsp;&emsp;&ensp;
-          <span>
-            Commits, that affect operational components like infrastructure, deployment, backup, recovery, ...
-          </span>
-        </label><br>
-
-        <input type="radio" id="chore" name="type" value="chore">
-        <label for="chore">
-          <code>chore</code>
-          &emsp;&emsp;&ensp;
-          <span>Miscellaneous commits e.g. modifying <code>.gitignore</code></span>
-        </label><br>
-        <input type="radio" id="wip" name="type" value="wip">
-        <label for="wip">
-          <code>WIP</code>
-          &emsp;&emsp;&emsp;&ensp;
-          <span>Work In Progress</span>
-        </label><br>
+        <button type="button" name="copy-git" id="copy-git" class="copy">
+          <svg xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 448 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+            <path fill="#222831"
+              d="M384 336l-192 0c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l140.1 0L400 115.9 400 320c0 8.8-7.2 16-16 16zM192 384l192 0c35.3 0 64-28.7 64-64l0-204.1c0-12.7-5.1-24.9-14.1-33.9L366.1 14.1c-9-9-21.2-14.1-33.9-14.1L192 0c-35.3 0-64 28.7-64 64l0 256c0 35.3 28.7 64 64 64zM64 128c-35.3 0-64 28.7-64 64L0 448c0 35.3 28.7 64 64 64l192 0c35.3 0 64-28.7 64-64l0-32-48 0 0 32c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16l0-256c0-8.8 7.2-16 16-16l32 0 0-48-32 0z" />
+          </svg>
+          <p>Git</p>
+        </button>
       </div>
     </div>
 
-    <div>
-      <label for="scope">Scope</label>
-      <input type="text" id="scope" name="scope"><br>
-    </div>
+    <div class="field">
+      <div class="type">
+        <label class="field-title">Type*</label>
+        <div class="type-content">
+          <div>
+            <div>
+              <input type="radio" hidden>
+              <label for="feat-fix"><span>API relevant changes</span></label><br>
+            </div>
 
-    <div>
-      <label for="description">Description</label>
-      <textarea id="description" name="description" rows="2" cols="30"></textarea><br>
-    </div>
+            <div class="type-select indentation ">
+              <input type="radio" id="feat" name="type" value="feat">
+              <label for="feat">
+                <code class="code-indentation">feat</code>
+                <span>Commits, that adds or remove a new feature</span>
+              </label><br>
+            </div>
 
-    <div>
-      <label for="body">Body</label>
-      <textarea id="body" name="body" rows="2" cols="30"></textarea><br>
-    </div>
+            <div class="type-select indentation">
+              <input type="radio" id="fix" name="type" value="fix">
+              <label for="fix">
+                <code class="code-indentation">fix</code>
+                <span>Commits, that fixes a bug</span>
+              </label><br>
+            </div>
+          </div>
 
-    <div>
-      <label for="footer">Footer(s)</label>
-      <textarea id="footer" name="footer" rows="2" cols="30"></textarea><br>
+          <div>
+            <div class="type-select">
+              <input type="radio" id="refactor" name="type" value="refactor">
+              <label for="refactor">
+                <code class="code">refactor</code>
+                <span>Commits, that rewrite/restructure your code, however does not change any API behaviour</span>
+              </label><br>
+            </div>
+
+            <div class="type-select indentation">
+              <input type="radio" id="perf" name="type" value="perf">
+              <label for="perf">
+                <code class="code-indentation">perf</code>
+                <span>Commits are special <code>refactor</code> commits, that improve performance</span>
+              </label><br>
+            </div>
+          </div>
+
+          <div class="type-select">
+            <input type="radio" id="style" name="type" value="style">
+            <label for="style">
+              <code class="code">style</code>
+              <span>
+                Commits, that do not affect the meaning (white-space, formatting, missing semi-colons, etc)
+              </span>
+            </label><br>
+          </div>
+
+          <div class="type-select">
+            <input type="radio" id="test" name="type" value="test">
+            <label for="test">
+              <code class="code">test</code>
+              <span>Commits, that add missing tests or correcting existing tests</span>
+            </label><br>
+          </div>
+
+          <div class="type-select">
+            <input type="radio" id="docs" name="type" value="docs">
+            <label for="docs">
+              <code class="code">docs</code>
+              <span>Commits, that affect documentation only</span>
+            </label><br>
+          </div>
+
+          <div class="type-select">
+            <input type="radio" id="build" name="type" value="build">
+            <label for="build">
+              <code class="code">build</code>
+              <span>
+                Commits, that affect build components like build tool, ci pipeline, dependencies, project version, ...
+              </span>
+            </label><br>
+          </div>
+
+          <div class="type-select">
+            <input type="radio" id="ops" name="type" value="ops">
+            <label for="ops">
+              <code class="code">ops</code>
+              <span>
+                Commits, that affect operational components like infrastructure, deployment, backup, recovery, ...
+              </span>
+            </label><br>
+          </div>
+
+          <div class="type-select">
+            <input type="radio" id="chore" name="type" value="chore">
+            <label for="chore">
+              <code class="code">chore</code>
+              <span>Miscellaneous commits e.g. modifying <code>.gitignore</code></span>
+            </label><br>
+          </div>
+
+          <div class="type-select">
+            <input type="radio" id="wip" name="type" value="wip">
+            <label for="wip">
+              <code class="code">WIP</code>
+              <span>Work In Progress</span>
+            </label><br>
+          </div>
+        </div>
+
+        <span class="type-alert" id="type-alert">*Please select type first!</span>
+      </div>
+
+      <div>
+        <label for="scope" class="field-title">Scope</label>
+        <input type="text" id="scope" name="scope">
+      </div>
+
+      <div>
+        <label for="description" class="field-title">Description</label>
+        <textarea id="description" name="description"></textarea>
+      </div>
+
+      <div>
+        <label for="body" class="field-title">Body</label>
+        <textarea id="body" name="body"></textarea>
+      </div>
+
+      <div>
+        <label for="footer" class="field-title">Footer(s)</label>
+        <textarea id="footer" name="footer"></textarea>
+      </div>
     </div>
   </div>
 </body>

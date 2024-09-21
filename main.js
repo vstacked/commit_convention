@@ -67,7 +67,12 @@ const createWindowMain = () => {
   winMain = new BrowserWindow({
     width: 800,
     height: 600,
-    resizable: false,
+    titleBarStyle: 'hidden',
+    titleBarOverlay: {
+      color: "#222831",
+      symbolColor: "#EEEEEE",
+      height: 40,
+    },
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },

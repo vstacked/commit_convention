@@ -2,9 +2,10 @@ $(async function () {
     const $profile = $("#profile");
     const $result = $("#result");
     const $clear = $("#clear");
-    const $copy = $("#copy");
-    const $inlineAlert = $("#inline-alert");
+    const $copyPlain = $("#copy-plain");
+    const $copyGit = $("#copy-git");
     const $type = $('input[type="radio"]');
+    const $typeAlert = $('#type-alert');
     const $scope = $("#scope");
     const $description = $("#description");
     const $body = $("#body");
@@ -18,7 +19,7 @@ $(async function () {
     $profile.on("click", () => {
         void window.profile.toggle();
     })
-    $("<span>").append(profileName).insertAfter($profile)
+    $("<p>").addClass("profile-used").append(profileName).insertAfter("#" + $profile.attr("id") + " svg")
 
     const scopeRegex = /\((.*?)\):/;
     const n = "<br>"
@@ -104,6 +105,23 @@ $(async function () {
         $result.html(head + n + n + footer)
     }
 
+    function scrollToBottom() {
+        $("html, body").animate({ scrollTop: $(document).height() }, 500);
+    }
+
+    function showInlineAlert() {
+        $(".inline-alert").remove()
+
+        $("<span>")
+            .addClass("inline-alert")
+            .append("Copied!")
+            .insertAfter(".result")
+
+        setTimeout(() => {
+            $(".inline-alert").remove()
+        }, 1000);
+    }
+
     // initial
     fieldStatus(false)
 
@@ -123,15 +141,22 @@ $(async function () {
     $clear.on("click", function () {
         $result.html("")
         $type.prop("checked", false)
-        $inlineAlert.html("")
+        $(".inline-alert").remove()
         type = ""
         $scope.val("")
         $description.val("")
         $body.val("")
         $footer.val("")
+
+        $typeAlert.show()
+
+        $type.each(function () {
+            const radio = $(this)
+            radio.parent().show(300)
+        })
     })
 
-    $copy.on("click", function () {
+    $copyPlain.on("click", function () {
         const copyText = $result.html().replaceAll(n, "\n");
 
         if (copyText.length === 0) {
@@ -140,11 +165,33 @@ $(async function () {
 
         navigator.clipboard.writeText(copyText);
 
-        $inlineAlert.show()
-        $inlineAlert.html("Copied!");
-        setTimeout(() => {
-            $inlineAlert.hide()
-        }, 1000);
+        showInlineAlert()
+
+        void window.store.saveContent({
+            id: profileUsed,
+            scope: $scope.val(),
+            description: $description.val(),
+            body: $body.val(),
+            footer: $footer.val(),
+        }).then(() => {
+            void initAutocomplete()
+        })
+    })
+
+    $copyGit.on("click", function () {
+        if ($result.html().length === 0) {
+            return
+        }
+
+        const first = type + getScope() + getDescription();
+        const second = !!getBody().length ? " -m \"" + getBody().replaceAll(n, "") + "\"" : "";
+        const third = !!getFooter().length ? " -m \"" + getFooter().replaceAll(n, "") + "\"" : "";
+
+        const git = "git commit -m \"" + first + "\"" + second + third;
+
+        navigator.clipboard.writeText(git);
+
+        showInlineAlert()
 
         void window.store.saveContent({
             id: profileUsed,
@@ -160,10 +207,36 @@ $(async function () {
     $type.on("click", function () {
         const val = $(this).val();
 
+        if (val === type) {
+            $result.html("")
+            $type.prop("checked", false)
+            type = ""
+            fieldStatus(false)
+
+            $typeAlert.show()
+
+            $type.each(function () {
+                const radio = $(this)
+                if (radio.val() !== val) {
+                    radio.parent().show(300)
+                }
+            })
+            return
+        }
+
         const tail = getScope() + getDescription() + getBody() + getFooter();
 
         type = val
         $result.html(val + tail);
+
+        $typeAlert.hide()
+
+        $type.each(function () {
+            const radio = $(this)
+            if (radio.val() !== val) {
+                radio.parent().hide(300)
+            }
+        })
     });
 
     $scope.on('propertychange input', async function (e) {
@@ -258,6 +331,7 @@ $(async function () {
 
                 if (text.substr(0, val.length).toUpperCase() === val.toUpperCase()) {
                     $("<div>")
+                        .addClass("autocomplete-items-child")
                         .html("<strong>" + text.substr(0, val.length) + "</strong>")
                         .append(text.substr(val.length))
                         .append($("<input>").attr({ type: "hidden" }).val(text))
@@ -274,15 +348,49 @@ $(async function () {
             if (!$(parent).find("div").length) {
                 $(parent).hide();
             }
+
+            scrollToBottom()
         });
 
         $(inp).on("keydown", function (e) {
             let children = $("#" + this.id + "autocomplete-list div")
 
-            if (e.key === "ArrowDown") {
+            if (e.ctrlKey && e.code === "Space") { // Ctrl + Space
+                if (!!$(this).parent().find("#" + this.id + "autocomplete-list").length) {
+                    return
+                }
+
+                closeAllLists()
+
+                currentFocus = -1;
+
+                let parent = $("<div>")
+                    .attr({ id: this.id + "autocomplete-list" })
+                    .addClass("autocomplete-items")
+                    .insertAfter($(this))
+                for (let index = 0; index < arr.length; index++) {
+                    const text = arr[index];
+                    $("<div>")
+                        .addClass("autocomplete-items-child")
+                        .css(index % 2 == 1 ? { "background": "#222831" } : {})
+                        .append(text)
+                        .append($("<input>").attr({ type: "hidden" }).val(text))
+                        .on("click", function () {
+                            const selected = $(this).find("input").val()
+                            $(inp).val(selected)
+                            cb(selected)
+                            closeAllLists()
+                        })
+                        .appendTo($(parent))
+                }
+
+                scrollToBottom()
+            } else if (e.key === "Escape") {
+                closeAllLists()
+            } else if (e.key === "ArrowDown" || (e.ctrlKey && e.key === "j")) {
                 currentFocus++;
                 addActive(children);
-            } else if (e.key === "ArrowUp") {
+            } else if (e.key === "ArrowUp" || (e.ctrlKey && e.key === "k")) {
                 currentFocus--;
                 addActive(children);
             } else if (e.key === "Enter") {
@@ -301,7 +409,12 @@ $(async function () {
             if (currentFocus >= children.length) currentFocus = 0;
             if (currentFocus < 0) currentFocus = (children.length - 1);
 
-            $(children).eq(currentFocus).addClass("autocomplete-active")
+            const parent = $(".autocomplete-items")
+            const focused = $(children).eq(currentFocus)
+
+            parent.scrollTop(parent.scrollTop() + focused.position().top)
+
+            focused.addClass("autocomplete-active")
         }
 
         function removeActive(children) {
@@ -309,7 +422,7 @@ $(async function () {
         }
 
         function closeAllLists(elmnt) {
-            $(".autocomplete-items").not(elmnt).not(inp).remove()
+            $(".autocomplete-items").remove()
         }
 
         $(document).on("click", function (e) {
