@@ -65,6 +65,8 @@ function initStore() {
 
 const createWindowMain = () => {
   winMain = new BrowserWindow({
+    minWidth: 800,
+    minHeight: 600,
     width: 800,
     height: 600,
     titleBarStyle: 'hidden',
@@ -89,10 +91,11 @@ const createWindowMain = () => {
 
 const createWindowProfile = () => {
   winProfile = new BrowserWindow({
+    minWidth: 700,
+    minHeight: 500,
     width: 700,
     height: 500,
     frame: false,
-    resizable: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
