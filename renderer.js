@@ -122,6 +122,43 @@ $(async function () {
         }, 1000);
     }
 
+    function selectType(val) {
+        $(".autocomplete-items").remove()
+
+        if (val === type) {
+            $result.html("")
+            $type.prop("checked", false)
+            type = ""
+            fieldStatus(false)
+
+            $typeAlert.show()
+
+            $type.each(function () {
+                const radio = $(this)
+                if (radio.val() !== val) {
+                    radio.parent().show(300)
+                }
+            })
+            return
+        }
+
+        const tail = getScope() + getDescription() + getBody() + getFooter();
+
+        type = val
+        $result.html(val + tail);
+
+        $typeAlert.hide()
+
+        $type.each(function () {
+            const radio = $(this)
+            if (radio.val() !== val) {
+                radio.parent().hide(300)
+            } else {
+                radio.parent().show(300)
+            }
+        })
+    }
+
     // initial
     fieldStatus(false)
 
@@ -157,7 +194,7 @@ $(async function () {
     })
 
     $copyPlain.on("click", function () {
-        const copyText = $result.html().replaceAll(n, "\n");
+        const copyText = $result.text().replaceAll(n, "\n");
 
         if (copyText.length === 0) {
             return
@@ -206,37 +243,7 @@ $(async function () {
 
     $type.on("click", function () {
         const val = $(this).val();
-
-        if (val === type) {
-            $result.html("")
-            $type.prop("checked", false)
-            type = ""
-            fieldStatus(false)
-
-            $typeAlert.show()
-
-            $type.each(function () {
-                const radio = $(this)
-                if (radio.val() !== val) {
-                    radio.parent().show(300)
-                }
-            })
-            return
-        }
-
-        const tail = getScope() + getDescription() + getBody() + getFooter();
-
-        type = val
-        $result.html(val + tail);
-
-        $typeAlert.hide()
-
-        $type.each(function () {
-            const radio = $(this)
-            if (radio.val() !== val) {
-                radio.parent().hide(300)
-            }
-        })
+        selectType(val)
     });
 
     $scope.on('propertychange input', async function (e) {
@@ -360,6 +367,8 @@ $(async function () {
                     return
                 }
 
+                if (!arr.length) return
+
                 closeAllLists()
 
                 currentFocus = -1;
@@ -421,7 +430,7 @@ $(async function () {
             $(children).removeClass("autocomplete-active")
         }
 
-        function closeAllLists(elmnt) {
+        function closeAllLists() {
             $(".autocomplete-items").remove()
         }
 
@@ -453,4 +462,30 @@ $(async function () {
     }
 
     void initAutocomplete()
+
+    $('html, body').on("keyup", function (e) {
+        e.stopImmediatePropagation();
+
+        if (e.ctrlKey && e.key === "1") {
+            selectType($type.eq(1).prop("checked", true).val())
+        } else if (e.ctrlKey && e.key === "2") {
+            selectType($type.eq(2).prop("checked", true).val())
+        } else if (e.ctrlKey && e.key === "3") {
+            selectType($type.eq(3).prop("checked", true).val())
+        } else if (e.ctrlKey && e.key === "4") {
+            selectType($type.eq(4).prop("checked", true).val())
+        } else if (e.ctrlKey && e.key === "5") {
+            selectType($type.eq(5).prop("checked", true).val())
+        } else if (e.ctrlKey && e.key === "6") {
+            selectType($type.eq(6).prop("checked", true).val())
+        } else if (e.ctrlKey && e.key === "7") {
+            selectType($type.eq(7).prop("checked", true).val())
+        } else if (e.ctrlKey && e.key === "8") {
+            selectType($type.eq(8).prop("checked", true).val())
+        } else if (e.ctrlKey && e.key === "9") {
+            selectType($type.eq(9).prop("checked", true).val())
+        } else if (e.ctrlKey && e.key === "0") {
+            selectType($type.eq(10).prop("checked", true).val())
+        }
+    })
 })

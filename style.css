@@ -1,26 +1,24 @@
 :root {
-  color-scheme: light dark;
   font-family: Arial, sans-serif;
+  background: #222831;
+  color: #EEEEEE;
 }
 
-@media (prefers-color-scheme: dark) {
-  body {
-    background: #222831;
-    color: #EEEEEE;
-  }
-}
-
-@media (prefers-color-scheme: light) {
-  body {
-    background: #ddd;
-    color: black
-  }
+body {
+  user-select: none;
 }
 
 input,
 textarea,
 select {
   font-family: inherit;
+}
+
+select:focus,
+input:focus,
+textarea:focus,
+button:focus {
+  outline-color: #76ABAE;
 }
 
 body {
@@ -71,7 +69,6 @@ body::-webkit-scrollbar {
   -webkit-user-select: none;
   user-select: none;
   cursor: default;
-
 }
 
 .profile {
