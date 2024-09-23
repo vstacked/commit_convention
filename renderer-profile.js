@@ -12,6 +12,14 @@ $(async function () {
         window.profile.toggle();
     })
 
+    $('html, body').on("keyup", function (e) {
+        e.stopImmediatePropagation();
+
+        if (e.key === "Escape") {
+            window.profile.toggle();
+        }
+    })
+
     let profiles = await window.store.getProfiles()
     let profileUsed = await window.store.getProfileUsed()
 
@@ -44,6 +52,7 @@ $(async function () {
                     pBtnAction.html("Show")
                 }
 
+                pBtnAction.addClass("button-action").removeClass("button-crud")
                 pBtnDelete.show()
                 pBtnCancelEdit.hide()
                 inlineAlert.html("")
@@ -64,6 +73,7 @@ $(async function () {
 
             const pInput = $("<input>")
                 .val(profileName)
+                .attr({ type: "text" })
                 .prop("disabled", isDefaultProfile)
                 .on("focusout", () => {
                     if (!hasProjectNameChanged()) {
@@ -83,6 +93,7 @@ $(async function () {
 
                     if (hasProjectNameChanged()) {
                         pBtnAction.html("Edit")
+                        pBtnAction.removeClass("button-action").addClass("button-crud")
                         pBtnCancelEdit.show()
                         pBtnApply.hide()
                         pBtnDelete.hide()
@@ -92,6 +103,7 @@ $(async function () {
 
 
             const pBtnCancelEdit = $("<button>")
+                .addClass("button-crud")
                 .attr({ type: "button" })
                 .append("Cancel")
                 .hide()
@@ -101,6 +113,7 @@ $(async function () {
                 })
 
             const pBtnCancelDelete = $("<button>")
+                .addClass("button-crud")
                 .attr({ type: "button" })
                 .append("Cancel")
                 .hide()
@@ -109,6 +122,7 @@ $(async function () {
                 })
 
             const pBtnDelete = $("<button>")
+                .addClass("button-crud")
                 .attr({ type: "button" })
                 .append("Delete Profile")
                 .on("click", async () => {
@@ -164,13 +178,14 @@ $(async function () {
                         otherBtnApplyProfile.not(pBtnApply).hide()
 
                         $('html, body').animate({
-                            scrollTop: collapsibleChild.offset().top
+                            scrollTop: collapsibleChild.offset().top - 40
                         }, 250)
                     }
                 })
 
             const pBtnApply = $("<button>")
                 .addClass("p-btn-apply")
+                .addClass(isApplied ? "button-applied-profile" : "button-apply-profile")
                 .attr({ type: "button" })
                 .prop("disabled", isApplied)
                 .append(isApplied ? "Applied" : "Apply Profile")
@@ -182,14 +197,17 @@ $(async function () {
 
             const pBtn = isDefaultProfile
                 ? $("<div>")
+                    .addClass("row")
                     .append(pBtnAction)
                     .append(pBtnApply)
                 : isApplied ?
                     $("<div>")
+                        .addClass("row")
                         .append(pBtnCancelEdit)
                         .append(pBtnAction)
                         .append(pBtnApply)
                     : $("<div>")
+                        .addClass("row")
                         .append(pBtnCancelDelete)
                         .append(pBtnDelete)
                         .append(pBtnCancelEdit)
@@ -205,13 +223,14 @@ $(async function () {
             // ---------------------------------------------------------------------
             // ---------------------------------------------------------------------
 
-            function contentItem(key, text, appendTo, generate) {
+            function contentItem(key, index, text, appendTo, generate) {
                 function resetDeleteContentButton() {
                     cBtnCancel.hide()
                     cBtnDelete.removeClass("delete-content")
                 }
 
                 const cBtnCancel = $("<button>")
+                    .addClass("button-crud")
                     .attr({ type: "button" })
                     .append("Cancel")
                     .hide()
@@ -220,6 +239,7 @@ $(async function () {
                     })
 
                 const cBtnDelete = $("<button>")
+                    .addClass("button-crud")
                     .attr({ type: "button" })
                     .html("Delete")
                     .on("click", () => {
@@ -248,7 +268,9 @@ $(async function () {
 
 
                 $("<div>")
+                    .addClass("content-item")
                     .addClass("row")
+                    .css(index % 2 == 1 ? { "background": "#222831" } : {})
                     .append($("<span>").html(text))
                     .append(cBtn)
                     .appendTo(appendTo)
@@ -262,7 +284,7 @@ $(async function () {
                 const lenScope = dataScope.length;
                 for (let i = 0; i < lenScope; i++) {
                     const text = dataScope[i];
-                    contentItem("scope", text, cScope, generateScope)
+                    contentItem("scope", i, text, cScope, generateScope)
                 }
             }
             generateScope()
@@ -275,7 +297,7 @@ $(async function () {
                 const lenDescription = dataDescription.length;
                 for (let i = 0; i < lenDescription; i++) {
                     const text = dataDescription[i];
-                    contentItem("description", text, cDescription, generateDescription)
+                    contentItem("description", i, text, cDescription, generateDescription)
                 }
             }
             generateDescription()
@@ -288,7 +310,7 @@ $(async function () {
                 const lenBody = dataBody.length;
                 for (let i = 0; i < lenBody; i++) {
                     const text = dataBody[i];
-                    contentItem("body", text, cBody, generateBody)
+                    contentItem("body", i, text, cBody, generateBody)
                 }
             }
             generateBody()
@@ -301,7 +323,7 @@ $(async function () {
                 const lenFooter = dataFooter.length;
                 for (let i = 0; i < lenFooter; i++) {
                     const text = dataFooter[i];
-                    contentItem("footer", text, cFooter, generateFooter)
+                    contentItem("footer", i, text, cFooter, generateFooter)
                 }
             }
             generateFooter()
@@ -347,6 +369,7 @@ $(async function () {
         })
         .on("focus", (e) => {
             const btnCancel = $("<button>")
+                .addClass("button-crud")
                 .attr({ type: "button" })
                 .append("Cancel")
                 .on("click", () => {
@@ -357,6 +380,7 @@ $(async function () {
                 })
 
             const btnSave = $("<button>")
+                .addClass("button-crud")
                 .attr({ type: "button" })
                 .html("Save")
                 .on("click", async () => {

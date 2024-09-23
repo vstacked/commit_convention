@@ -1,40 +1,140 @@
 :root {
-  color-scheme: light dark;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: Arial, sans-serif;
+  background: #222831;
+  color: #EEEEEE;
 }
 
-@media (prefers-color-scheme: dark) {
-  body {
-    background: #333;
-    color: white;
-  }
+body {
+  user-select: none;
 }
 
-@media (prefers-color-scheme: light) {
-  body {
-    background: #ddd;
-    color: black;
-  }
+input {
+  all: unset;
+  width: 40%;
+  font-family: inherit;
 }
 
-.profile {
+input[type=text] {
+  background: #31363F;
+  color: #EEEEEE;
+  padding-left: 5px;
+}
+
+input:disabled {
+  cursor: not-allowed;
+}
+
+input::placeholder {
+  color: #eeeeee6e;
+}
+
+button {
+  all: unset;
+  cursor: pointer;
+  background: #76ABAE;
+  color: #31363F;
+  padding: 0 10px;
+  margin: 0 5px 0 0;
+  font-size: small;
+  height: 20px;
+  border-radius: 3px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+h3 {
+  color: #76ABAE;
+}
+
+body {
+  overflow-y: auto;
+  padding: 0;
+  margin: 0;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 3px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #31363F;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #EEEEEE;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #EEEEEE;
+}
+
+.app-bar {
+  height: 40px;
+  position: fixed;
+  width: 100%;
+  background: #222831;
+  top: 0;
+  left: 0;
   display: flex;
-  justify-content: flex-end;
-  padding: 10px;
+  flex-direction: row;
 }
 
-.collapsible {
-  background-color: #777;
-  color: white;
+.drag-area {
+  width: 100%;
+  height: 100%;
+  -webkit-app-region: drag;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
+.close {
+  height: 40px;
+  width: fit-content;
+  padding: 0 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+  margin: 0 0.5rem;
+}
+
+.close:hover {
+  background-color: #31363F;
+  border-radius: 5px;
+}
+
+.close svg {
+  height: 1.15rem;
+  width: 1.15rem;
+}
+
+.body-content {
+  margin: 50px 2rem 2rem 2rem;
+  background-color: #31363F;
+  padding: 0.5rem;
+  border-radius: 5px;
+}
+
+.collapsible,
+.add-profile-input {
+  background-color: #31363F;
+  color: #EEEEEE;
   padding: 4.5px 0;
   width: 100%;
-  border: none;
   text-align: left;
   outline: none;
   font-size: 15px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  height: 20px;
 }
 
 .row {
@@ -43,20 +143,50 @@
   justify-content: space-between;
 }
 
-.active,
-.collapsible:hover {
-  background-color: #555;
+.active {
+  background-color: #31363F;
 }
 
 .content {
   padding: 0 18px;
   display: none;
   overflow: hidden;
-  background-color: #e9e9e920;
+  background-color: #31363F;
+}
+
+.content-item {
+  margin-bottom: 10px;
+  padding: 5px;
+}
+
+.content-item span {
+  width: 75%;
+}
+
+.content-item div {
+  width: 25%;
+  justify-content: flex-end;
+}
+
+.button-crud {
+  border: 1px solid #76ABAE;
+  background-color: #31363F;
+  color: #EEEEEE;
+}
+
+.button-action {
+  border: 1px solid #76ABAE;
+  background-color: #31363F;
+  color: #76ABAE;
+}
+
+.button-applied-profile {
+  background-color: #76abae8a;
 }
 
 .inline-alert {
+  margin-top: 10px;
   display: flex;
   justify-content: flex-end;
-  font-size: small;
+  font-size: 12px;
 }
