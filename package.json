@@ -3,11 +3,27 @@
   "version": "1.0.0",
   "main": "main.js",
   "license": "MIT",
+  "author": "vstacked",
+  "description": "a commit conventional tools, but GUI",
+  "build": {
+    "productName": "Commit Convention",
+    "appId": "vstacked.commit_convention",
+    "mac": {
+      "category": "public.app-category.developer-tools"
+    },
+    "win": {
+      "icon": "icon.png"
+    }
+  },
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "app:dir": "electron-builder --dir",
+    "app:dist": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
   },
   "devDependencies": {
     "electron": "^32.0.1",
+    "electron-builder": "24.13.3",
     "jquery": "^3.7.1"
   },
   "dependencies": {
