@@ -139,6 +139,7 @@ $(async function () {
 
             const pBtnAction = $("<button>")
                 .addClass("p-btn-action")
+                .addClass("button-action")
                 .attr({ type: "button" })
                 .append("Show")
                 .on("click", async () => {
