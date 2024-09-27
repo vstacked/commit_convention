@@ -63,26 +63,6 @@ $ yarn run start
 
 You can [download](https://github.com/vstacked/commit_convention/releases/tag/1.0.0) the latest installable version of Commit Convention for Windows.
 
-## Keyboard Shortcuts
-
-| Command                                | Key                                                            |
-| -------------------------------------- | -------------------------------------------------------------- |
-| Select / Unselect type `feat`          | <kbd>ctrl</kbd><kbd>1</kbd>                                    |
-| Select / Unselect type `fix`           | <kbd>ctrl</kbd><kbd>2</kbd>                                    |
-| Select / Unselect type `refactor`      | <kbd>ctrl</kbd><kbd>3</kbd>                                    |
-| Select / Unselect type `perf`          | <kbd>ctrl</kbd><kbd>4</kbd>                                    |
-| Select / Unselect type `style`         | <kbd>ctrl</kbd><kbd>5</kbd>                                    |
-| Select / Unselect type `test`          | <kbd>ctrl</kbd><kbd>6</kbd>                                    |
-| Select / Unselect type `docs`          | <kbd>ctrl</kbd><kbd>7</kbd>                                    |
-| Select / Unselect type `build`         | <kbd>ctrl</kbd><kbd>8</kbd>                                    |
-| Select / Unselect type `chore`         | <kbd>ctrl</kbd><kbd>9</kbd>                                    |
-| Select / Unselect type `ops`           | <kbd>ctrl</kbd><kbd>0</kbd>                                    |
-| Trigger autocomplete                   | <kbd>ctrl</kbd><kbd>space</kbd>                                |
-| Close autocomplete & Profile(s) window | <kbd>Esc</kbd>                                                 |
-| Autocomplete select move down          | <kbd>Arrow Down</kbd><br/>or <br/> <kbd>ctrl</kbd><kbd>j</kbd> |
-| Autocomplete select move up            | <kbd>Arrow Up</kbd><br/>or <br/> <kbd>ctrl</kbd><kbd>k</kbd>   |
-| Autocomplete apply selected            | <kbd>Enter</kbd>                                               |
-
 ## License
 
 MIT
