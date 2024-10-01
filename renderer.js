@@ -11,8 +11,8 @@ $(async function () {
     const $body = $("#body");
     const $footer = $("#footer");
 
-    const profiles = await window.store.getProfiles()
-    const profileUsed = await window.store.getProfileUsed()
+    let profiles = await window.store.getProfiles()
+    let profileUsed = await window.store.getProfileUsed()
 
     const profileName = profiles[profileUsed].profile
 
@@ -25,6 +25,11 @@ $(async function () {
     const n = "<br>"
 
     let type;
+
+    async function refetchLocal() {
+        profiles = await window.store.getProfiles()
+        profileUsed = await window.store.getProfileUsed()
+    }
 
     function getScope() {
         return $scope.val().length !== 0 ? `(${$scope.val()}): ` : ": "
@@ -175,7 +180,9 @@ $(async function () {
         characterData: true
     });
 
-    $clear.on("click", function () {
+    $clear.on("click", async function () {
+        await initAutocomplete()
+
         $result.html("")
         $type.prop("checked", false)
         $(".inline-alert").remove()
@@ -363,10 +370,6 @@ $(async function () {
             let children = $("#" + this.id + "autocomplete-list div")
 
             if (e.ctrlKey && e.code === "Space") { // Ctrl + Space
-                if (!!$(this).parent().find("#" + this.id + "autocomplete-list").length) {
-                    return
-                }
-
                 if (!arr.length) return
 
                 closeAllLists()
@@ -444,6 +447,9 @@ $(async function () {
     }
 
     async function initAutocomplete() {
+        await refetchLocal();
+        $(".autocomplete-items").remove()
+
         autocomplete($scope, await getAutocomplete("scope"), function (selected) {
             handleScope(selected)
         });
