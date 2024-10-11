@@ -634,7 +634,9 @@ $(async function () {
 
         if (isGeminiApiKeyFieldActive()) {
             if (e.key === "Escape" || e.key === "Enter") {
-                window.store.setGeminiApiKey(geminiApiKey);
+                if (geminiApiKey) {
+                    window.store.setGeminiApiKey(geminiApiKey);
+                }
 
                 $geminiApiKeyFieldOverlay.hide()
                 $('html, body').css("overflow-y", "auto")
