@@ -13,6 +13,10 @@
     <img src="https://img.shields.io/badge/Electron-191970?logo=Electron&logoColor=white"
          alt="Electron">
   </a>
+  <a href="https://jquery.com/">
+    <img src="https://img.shields.io/badge/jquery-%230769AD.svg?logo=jquery&logoColor=white"
+         alt="Electron">
+  </a>
   <a href="https://code.visualstudio.com/"><img src="https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?logo=visual-studio-code&logoColor=white"></a>
   <a href="https://github.com/vstacked/commit_convention">
       <img src="https://img.shields.io/github/last-commit/vstacked/commit_convention">
@@ -27,7 +31,11 @@
   <a href="#license">License</a>
 </p>
 
-![screenshot](https://github.com/user-attachments/assets/e7d6d6e2-e368-4119-b529-b224be67501d)
+![demo](https://github.com/user-attachments/assets/e7d6d6e2-e368-4119-b529-b224be67501d)
+
+### with Gemini 🎉
+
+![demo-gemini](https://github.com/user-attachments/assets/e7bbba28-91a1-4a68-bed5-3c9a7ee2a466)
 
 ## Key Features
 
@@ -40,6 +48,7 @@
   - Create and manage multiple profiles for different projects
   - Customize commit types and templates for each profile
 - History Management
+- Integrated with [Gemini AI](https://gemini.google.com/) to review and revised your commit message
 
 ## How To Use
 
