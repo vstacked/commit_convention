@@ -37,6 +37,8 @@
 
 ![demo-gemini](https://github.com/user-attachments/assets/e7bbba28-91a1-4a68-bed5-3c9a7ee2a466)
 
+Note: to using this feature, please generate your own key at [Google AI Studio](https://aistudio.google.com/)
+
 ## Key Features
 
 - Write commit messages quickly with a tap/click interface
