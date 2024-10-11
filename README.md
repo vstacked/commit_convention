@@ -72,7 +72,7 @@ $ yarn run start
 
 ## Download
 
-You can [download](https://github.com/vstacked/commit_convention/releases/tag/1.0.0) the latest installable version of Commit Convention for Windows.
+You can [download](https://github.com/vstacked/commit_convention/releases/latest) the latest installable version of Commit Convention for Windows.
 
 ## Keyboard Shortcuts
 
