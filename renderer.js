@@ -1,9 +1,19 @@
 $(async function () {
+    const $geminiApiKeyFieldOverlay = $("#gemini-api-key-field-overlay");
+    const $geminiApiKeyField = $("#gemini-api-key-field");
     const $profile = $("#profile");
     const $result = $("#result");
+    const $generatingOverlay = $("#generating-overlay");
+    const $geminiApiKey = $("#gemini-api-key");
+    const $gemini = $("#gemini");
+    const $resultButton = $("#result-button");
+    const $resultButtonGemini = $("#result-button-gemini");
     const $clear = $("#clear");
     const $copyPlain = $("#copy-plain");
     const $copyGit = $("#copy-git");
+    const $cancel = $("#cancel");
+    const $retry = $("#retry");
+    const $apply = $("#apply");
     const $type = $('input[type="radio"]');
     const $typeAlert = $('#type-alert');
     const $scope = $("#scope");
@@ -22,9 +32,12 @@ $(async function () {
     $("<p>").addClass("profile-used").append(profileName).insertAfter("#" + $profile.attr("id") + " svg")
 
     const scopeRegex = /\((.*?)\):/;
-    const n = "<br>"
+    const n = "\n"
+    const geminiActiveHex = "rgb(238, 238, 238)"
 
+    let actualResult;
     let type;
+    let geminiApiKey;
 
     async function refetchLocal() {
         profiles = await window.store.getProfiles()
@@ -45,6 +58,14 @@ $(async function () {
 
     function getFooter() {
         return $footer.val().length !== 0 ? n + n + $footer.val() : ""
+    }
+
+    function isGeminiApiKeyFieldActive() {
+        return $geminiApiKeyFieldOverlay.css("display") !== "none"
+    }
+
+    function isGeminiActive() {
+        return $gemini.css("background-color") === geminiActiveHex
     }
 
     function fieldStatus(enabled) {
@@ -164,13 +185,43 @@ $(async function () {
         })
     }
 
+    function typeStatus(enabled) {
+        $type.prop("disabled", !enabled)
+        $(".type-select, .type-select label, .type input[type='radio']").css({ cursor: enabled ? "auto" : "not-allowed" })
+    }
+
+    function cancelGemini() {
+        $gemini.css("background-color", "#222831")
+        $result.html(actualResult)
+
+        $resultButton.show()
+        $resultButtonGemini.hide()
+
+        fieldStatus(true)
+        typeStatus(true)
+    }
+
     // initial
     fieldStatus(false)
+    $geminiApiKeyFieldOverlay.hide()
+    $generatingOverlay.hide()
+    $resultButtonGemini.hide()
+    $gemini.css({ cursor: "not-allowed" })
 
     // Create an observer instance
     const observerResult = new MutationObserver(function (mutations) {
         const enabled = $result.html().length !== 0
-        fieldStatus(enabled)
+
+        // control field status when gemini is inactive
+        if (!isGeminiActive()) {
+            fieldStatus(enabled)
+        }
+
+        if (type.length > 0 && $description.val().length > 0) {
+            $gemini.css({ cursor: "pointer" })
+        } else {
+            $gemini.css({ cursor: "not-allowed" })
+        }
     });
 
     // Pass in the target node, as well as the observer options
@@ -179,6 +230,107 @@ $(async function () {
         childList: true,
         characterData: true
     });
+
+    $geminiApiKey.on("click", async function () {
+        $geminiApiKeyFieldOverlay.show()
+        $('html, body')
+            .css("overflow-y", "hidden")
+            .animate({ scrollTop: 0 })
+
+        const apiKey = await window.store.getGeminiApiKey()
+        $geminiApiKeyField.val(apiKey)
+    })
+
+    $geminiApiKeyField.on('propertychange input', async function (e) {
+        var valueChanged = false;
+
+        if (e.type == 'propertychange') {
+            valueChanged = e.originalEvent.propertyName == 'value';
+        } else {
+            valueChanged = true;
+        }
+
+        if (!valueChanged) return;
+
+        geminiApiKey = e.target.value
+    });
+
+    $gemini.on("click", async function () {
+        const t = $(this)
+
+        if (t.css("cursor") === "not-allowed") {
+            return
+        }
+
+        if (isGeminiActive()) {
+            cancelGemini()
+        } else {
+            t.css("background-color", geminiActiveHex)
+            actualResult = $result.html()
+
+            $generatingOverlay.show()
+
+            const result = await window.gemini.sendMessage(actualResult)
+            $result.html(result)
+
+            $resultButton.hide()
+            $resultButtonGemini.show()
+
+            typeStatus(false)
+            fieldStatus(false)
+
+            $generatingOverlay.hide()
+        }
+    })
+
+    $cancel.on("click", function () {
+        cancelGemini()
+    })
+
+    $retry.on("click", async function () {
+        $generatingOverlay.show()
+
+        const result = await window.gemini.sendMessage(actualResult)
+        $result.html(result)
+
+        $generatingOverlay.hide()
+    })
+
+    $apply.on("click", async function () {
+        const geminiResult = $result.find("pre").text()
+
+        const types = ["feat", "fix", "refactor", "perf", "style", "test", "docs", "build", "chore", "ops", "wip"]
+        const regex = /^(?<type>feat|fix|refactor|perf|style|test|docs|build|chore|ops|wip)(?:\((?<scope>[^)]+)\))?: (?<description>[^\n]+)(?:\n\n(?<body>[^\n][\s\S]*?))?(?:\n\n(?<footer>[^\n][\s\S]*?))?$/;
+
+        function trimTrailingNewlines(text) {
+            if (text) {
+                return text.replace(/\n+$/, '');
+            }
+            return undefined
+        }
+
+        const match = trimTrailingNewlines(geminiResult).match(regex)
+
+        if (!match) return
+
+        const { type, scope, description, body, footer } = match.groups
+
+        $scope.val(trimTrailingNewlines(scope));
+        $description.val(trimTrailingNewlines(description));
+        $body.val(trimTrailingNewlines(body));
+        $footer.val(trimTrailingNewlines(footer));
+
+        const radioType = $type.eq(types.findIndex(e => e === type) + 1)
+        if (!radioType.prop("checked")) {
+            selectType(radioType.prop("checked", true).val())
+        }
+
+        setTimeout(() => {
+            $result.html(type + getScope() + getDescription() + getBody() + getFooter())
+        }, 0);
+
+        cancelGemini()
+    })
 
     $clear.on("click", async function () {
         await initAutocomplete()
@@ -340,30 +492,35 @@ $(async function () {
                 .addClass("autocomplete-items")
                 .insertAfter($(this))
 
+            let indexBg = 0
+
             for (let index = 0; index < arr.length; index++) {
                 const text = arr[index];
 
                 if (text.substr(0, val.length).toUpperCase() === val.toUpperCase()) {
                     $("<div>")
                         .addClass("autocomplete-items-child")
-                        .html("<strong>" + text.substr(0, val.length) + "</strong>")
-                        .append(text.substr(val.length))
-                        .append($("<input>").attr({ type: "hidden" }).val(text))
+                        .css(indexBg % 2 == 1 ? { "background": "#222831" } : {})
+                        .append(
+                            $("<pre>")
+                                .html("<strong>" + text.substr(0, val.length) + "</strong>")
+                                .append(text.substr(val.length))
+                                .append($("<input>").attr({ type: "hidden" }).val(text))
+                        )
                         .on("click", function () {
                             const selected = $(this).find("input").val()
                             $(inp).val(selected)
                             cb(selected)
                             closeAllLists()
                         }).appendTo($(parent))
+                    indexBg++;
                 }
             }
 
             // hide autocomplete when result is empty
-            if (!$(parent).find("div").length) {
+            if (!$(parent).find("pre").length) {
                 $(parent).hide();
             }
-
-            scrollToBottom()
         });
 
         $(inp).on("keydown", function (e) {
@@ -385,8 +542,11 @@ $(async function () {
                     $("<div>")
                         .addClass("autocomplete-items-child")
                         .css(index % 2 == 1 ? { "background": "#222831" } : {})
-                        .append(text)
-                        .append($("<input>").attr({ type: "hidden" }).val(text))
+                        .append(
+                            $("<pre>")
+                                .append(text)
+                                .append($("<input>").attr({ type: "hidden" }).val(text))
+                        )
                         .on("click", function () {
                             const selected = $(this).find("input").val()
                             $(inp).val(selected)
@@ -395,19 +555,18 @@ $(async function () {
                         })
                         .appendTo($(parent))
                 }
-
-                scrollToBottom()
             } else if (e.key === "Escape") {
                 closeAllLists()
             } else if (e.key === "ArrowDown" || (e.ctrlKey && e.key === "j")) {
                 currentFocus++;
                 addActive(children);
+                scrollToBottom()
             } else if (e.key === "ArrowUp" || (e.ctrlKey && e.key === "k")) {
                 currentFocus--;
                 addActive(children);
             } else if (e.key === "Enter") {
-                e.preventDefault();
                 if (currentFocus > -1) {
+                    e.preventDefault();
                     $(children).eq(currentFocus).trigger("click")
                 }
             }
@@ -438,7 +597,8 @@ $(async function () {
         }
 
         $(document).on("click", function (e) {
-            closeAllLists(e.target);
+            e.stopImmediatePropagation();
+            closeAllLists();
         })
     }
 
@@ -471,6 +631,22 @@ $(async function () {
 
     $('html, body').on("keyup", function (e) {
         e.stopImmediatePropagation();
+
+        if (isGeminiApiKeyFieldActive()) {
+            if (e.key === "Escape" || e.key === "Enter") {
+                window.store.setGeminiApiKey(geminiApiKey);
+
+                $geminiApiKeyFieldOverlay.hide()
+                $('html, body').css("overflow-y", "auto")
+            }
+
+            return
+        }
+
+        if (isGeminiActive()) {
+            typeStatus(false)
+            return
+        }
 
         if (e.ctrlKey && e.key === "1") {
             selectType($type.eq(1).prop("checked", true).val())

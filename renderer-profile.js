@@ -272,7 +272,7 @@ $(async function () {
                     .addClass("content-item")
                     .addClass("row")
                     .css(index % 2 == 1 ? { "background": "#222831" } : {})
-                    .append($("<span>").html(text))
+                    .append($("<pre>").html(text))
                     .append(cBtn)
                     .appendTo(appendTo)
             }

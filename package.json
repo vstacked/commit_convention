@@ -22,13 +22,17 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "devDependencies": {
+    "@types/jquery": "^3.5.31",
     "electron": "^32.0.1",
-    "electron-builder": "24.13.3",
-    "jquery": "^3.7.1"
+    "electron-builder": "24.13.3"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.20.0",
+    "dotenv": "^16.4.5",
     "electron-store": "8.2.0",
+    "jquery": "^3.7.1",
     "sanitize-html": "^2.13.0",
+    "showdown": "^2.1.0",
     "uuid": "^10.0.0"
   }
 }

@@ -18,4 +18,10 @@ contextBridge.exposeInMainWorld("store", {
     saveContent: (json) => ipcRenderer.invoke("store:saveContent", json),
     getContent: (json) => ipcRenderer.invoke("store:getContent", json),
     deleteContent: (json) => ipcRenderer.invoke("store:deleteContent", json),
+    getGeminiApiKey: () => ipcRenderer.invoke("store:getGeminiApiKey"),
+    setGeminiApiKey: (key) => ipcRenderer.invoke("store:setGeminiApiKey", key),
+})
+
+contextBridge.exposeInMainWorld('gemini', {
+    sendMessage: (input) => ipcRenderer.invoke("gemini:sendMessage", input)
 })

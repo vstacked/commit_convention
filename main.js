@@ -3,8 +3,51 @@ const path = require("node:path");
 const sanitizeHtml = require("sanitize-html")
 const Store = require("electron-store")
 const { v4: uuidv4 } = require('uuid');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+require('dotenv').config()
+const showdown = require('showdown')
 
 let winMain, winProfile, winProfileToggle, store;
+
+let geminiApiKey = process.env.GEMINI_API_KEY;
+let genAI, model, chatSession;
+
+const generationConfig = {
+  temperature: 1,
+  topP: 0.95,
+  topK: 64,
+  maxOutputTokens: 8192,
+  responseMimeType: "text/plain",
+};
+
+function initializeGemini() {
+  genAI = new GoogleGenerativeAI(geminiApiKey);
+
+  model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+  });
+
+
+  chatSession = model.startChat({
+    generationConfig,
+    // safetySettings: Adjust safety settings
+    // See https://ai.google.dev/gemini-api/docs/safety-settings
+    history: [
+      {
+        role: "user",
+        parts: [
+          { text: "Please review and revise the following text base on conventional commit common rules:\n\nConventional Commit Rules Adherence:\n- Structure the message according to the Conventional Commits specification (https://www.conventionalcommits.org/)\n- Format the first line as: <type>[optional scope]: <description>\n- Limit the first line to 50 characters or less, or for more context can be describe (in point if possible) in description\n\nGrammar Correction:\n- Fix any spelling errors, punctuation mistakes, and incorrect word usage\n- Ensure proper subject-verb agreement and consistent verb tense\n- Correct any issues with sentence structure or fragments\n\nReadability Improvement:\n- Break long, complex sentences into shorter, clearer ones, or also can describe on description (using point if possible) instead\n- Use active voice where appropriate\n- Ensure logical flow between sentences and paragraphs\n- Replace jargon or overly complex terms with simpler alternatives when possible\n\nClarity Enhancement:\n- Eliminate any ambiguous or vague statements\n- Add necessary context or explanations where the meaning isn't immediately clear\n- Ensure that pronouns have clear antecedents\n\nPlease provide the revised version, using formatting to highlight your changes:\n- Use bold for grammar corrections\n- Use italics for readability improvements\n- Use code formatting for changes related to commit message structure\n\nand the format is like:\n\nfeat(lorem): lorem ipsum\n\nlorem ipsum ( NOTE: this no need new line space to point below)\n- lorem\n- ipsum\n\nlorem #4\n\n\nor\n\n\nfeat: lorem ipsum\n\nlorem ipsum, lorem\n\nPlease apply the following revision process to my next message. Only return the result and change(s) made, also no further questions." },
+        ],
+      },
+      {
+        role: "model",
+        parts: [
+          { text: "Please provide the text you would like me to review and revise. I will apply the conventional commit rules and formatting as instructed. \n" },
+        ],
+      },
+    ],
+  });
+}
 
 function initStore() {
   const schema = {
@@ -57,7 +100,10 @@ function initStore() {
     profileUsed: {
       type: "string",
       default: "default"
-    }
+    },
+    geminiApiKey: {
+      type: "string",
+    },
   };
 
   store = new Store({ schema });
@@ -112,6 +158,11 @@ const createWindowProfile = () => {
 app.whenReady().then(() => {
   initStore();
   createWindowMain();
+
+  setTimeout(() => {
+    geminiApiKey = store.get("geminiApiKey")
+    initializeGemini();
+  }, 0);
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -378,5 +429,58 @@ ipcMain.handle("store:deleteContent", (_event, json) => {
     }
   } catch (error) {
     console.error("store:deleteContent" + error);
+  }
+})
+
+/**
+ * Handles the "store:getGeminiApiKey" IPC event.
+ * This function is used to retrieve Gemini API key from the store.
+ * 
+ * @param {Electron.IpcMainInvokeEvent} _event - The IPC event object (unused in this function).
+ * @returns {Promise<string>} A promise that resolves with the API Key.
+ */
+ipcMain.handle("store:getGeminiApiKey", (_event) => {
+  return store.get("geminiApiKey")
+})
+
+/**
+ * Handles the "store:setGeminiApiKey" IPC event.
+ * This function is used to save Gemini API Key to store.
+ * 
+ * @param {Electron.IpcMainInvokeEvent} _event - The IPC event object (unused in this function).
+ * @param {string} key - The API Key to be applied in Gemini.
+ * @returns {Promise<void>} A promise that resolves when the profile has been applied.
+ */
+ipcMain.handle("store:setGeminiApiKey", (_event, key) => {
+  try {
+    store.set("geminiApiKey", key);
+
+    geminiApiKey = key;
+    initializeGemini();
+
+    winMain.reload()
+  } catch (error) {
+    console.error("store:setGeminiApiKey" + error);
+  }
+})
+
+/**
+ * Handles the "gemini:sendMessage" IPC event.
+ * This function is used to generate revised message from Gemini.
+ * 
+ * @param {Electron.IpcMainInvokeEvent} _event - The IPC event object (unused in this function).
+ * @param {string} input - commit message that will be revised by Gemini.
+ * @returns {Promise<string>} A promise of string that resolves when generating success then convert to HTML tag either failure message.
+ */
+ipcMain.handle("gemini:sendMessage", async (_event, input) => {
+  try {
+    const converter = new showdown.Converter()
+
+    const result = await chatSession.sendMessage(input);
+
+    return converter.makeHtml(result.response.text())
+  } catch (error) {
+    console.error("gemini:sendMessage" + error);
+    return error.message;
   }
 })
