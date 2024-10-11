@@ -248,7 +248,7 @@ $(async function () {
                             resetDeleteContentButton()
 
                             void window.store.deleteContent({
-                                id: profileUsed,
+                                id,
                                 key,
                                 content: text,
                             }).then(async () => {
